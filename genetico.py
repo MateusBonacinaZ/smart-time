@@ -2,6 +2,7 @@
 
 import pandas as pd
 import random
+import os
 
 
 class SmartTime:
@@ -12,7 +13,7 @@ class SmartTime:
 
     @staticmethod
     def coletar_informacoes():
-        df = pd.read_excel("/home/bonacina/Desenvolvimento/Projeto Integrador/planilha.xlsx")
+        df = pd.read_excel(f"{os.path.dirname(os.path.realpath(__file__))}/planilha.xlsx")
 
         tamanho_populacao = None
         numero_termos = None
@@ -121,7 +122,7 @@ class SmartTime:
             populacao.append(matriz_grade)
         for pop in populacao:
             print(pop, end="\n\n\n")
-        quit()
+        return populacao
 
 
 SmartTime()
