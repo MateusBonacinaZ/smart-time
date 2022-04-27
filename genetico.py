@@ -19,13 +19,6 @@ class SmartTime:
         numero_termos = None
         numero_aulas = None
         numero_dias = None
-
-        primeiro_termo = []
-        segundo_termo = []
-        terceiro_termo = []
-        quarto_termo = []
-        quinto_termo = []
-        sexto_termo = []
         informacoes_completas = []
 
         for configuracao in df['Configurações']:
@@ -41,15 +34,15 @@ class SmartTime:
 
         for termo in range(1, numero_termos+1):
 
-            disciplina = []
+            informacoes_termo = []
             for aula in df[f'{termo}° Termo']:
 
                 if pd.isnull(aula) is False:
                     infos = str(aula).split("/")
-                    disciplina.append((f'{infos[0].strip()}', f'{infos[1].strip()}', f'{int(str(infos[2]).strip())}'))
+                    informacoes_termo.append((f'{infos[0].strip()}', f'{infos[1].strip()}', f'{int(str(infos[2]).strip())}'))
 
-            disciplina.sort(key=lambda x: x[2], reverse=True)
-            informacoes_completas.append(disciplina)
+            informacoes_termo.sort(key=lambda x: x[2], reverse=True)
+            informacoes_completas.append(informacoes_termo)
 
         return tamanho_populacao, numero_termos, numero_aulas, numero_dias, informacoes_completas
 
