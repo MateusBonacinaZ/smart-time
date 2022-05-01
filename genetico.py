@@ -9,6 +9,8 @@ import os
 class SmartTime:
     def __init__(self):
         self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
+        self.verificar_erros_importacao()
+        quit()
         self.populacao_inicial = self.gerar_populacao()
         self.avaliar_populacao(self.populacao_inicial)
 
@@ -38,10 +40,6 @@ class SmartTime:
                 elif "professores" in str(configuracao):
                     numero_professores = int(str(configuracao).split(':')[1].strip())
 
-        if len(disponibilidade_professores) != numero_professores:
-            print("Número de professores incorreto!")
-            quit()
-
         for termo in range(1, numero_termos+1):
 
             informacoes_termo = []
@@ -55,6 +53,27 @@ class SmartTime:
             informacoes_completas.append(informacoes_termo)
 
         return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores,informacoes_completas
+
+    def verificar_erros_importacao(self):
+
+        if len(self.disponibilidade_professores) != self.numero_professores:
+            print("Número de professores incorreto!")
+            quit()
+
+        if len(self.informacoes_excel) != self.numero_termos:
+            print("Número de termos incorreto!")
+            quit()
+
+        for professor_disponivel in self.disponibilidade_professores:
+            if len(self.disponibilidade_professores[professor_disponivel]) != self.numero_dias:
+                print("ERRO: Quantidade de dias discrepante!")
+                quit()
+
+            for dia_disponivel in self.disponibilidade_professores[professor_disponivel]:
+                if len(self.disponibilidade_professores[professor_disponivel][dia_disponivel]) != 0:
+                    if max(self.disponibilidade_professores[professor_disponivel][dia_disponivel]) > self.numero_aulas:
+                        print("ERRO: Quantidade de aulas discrepante")
+                        quit()
 
     def gerar_populacao(self):
         populacao = []
