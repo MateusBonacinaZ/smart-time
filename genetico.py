@@ -52,7 +52,7 @@ class SmartTime:
             informacoes_termo.sort(key=lambda x: x[2], reverse=True)
             informacoes_completas.append(informacoes_termo)
 
-        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores,informacoes_completas
+        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores, informacoes_completas
 
     def verificar_erros_importacao(self):
 
@@ -71,9 +71,15 @@ class SmartTime:
 
             for dia_disponivel in self.disponibilidade_professores[professor_disponivel]:
                 if len(self.disponibilidade_professores[professor_disponivel][dia_disponivel]) != 0:
-                    if max(self.disponibilidade_professores[professor_disponivel][dia_disponivel]) > self.numero_aulas:
-                        print("ERRO: Quantidade de aulas discrepante")
+                    if max(self.disponibilidade_professores[professor_disponivel][dia_disponivel]) > self.numero_aulas-1:
+                        print("ERRO: Quantidade de aulas discrepante!")
                         quit()
+
+        for termo in range(self.numero_termos):
+            for disciplina in range(len(self.informacoes_excel[termo])):
+                if self.informacoes_excel[termo][disciplina][1] not in self.disponibilidade_professores:
+                    print("ERRO: Professores discrepantes!")
+                    quit()
 
     def gerar_populacao(self):
         populacao = []

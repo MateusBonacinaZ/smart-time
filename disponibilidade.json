@@ -1,30 +1,18 @@
-
 {
   "Marisa": {"Segunda": [0, 1, 2, 3], "Terça": [], "Quarta": [], "Quinta":  [], "Sexta": [0, 1, 2, 3]},
   "Favan": {"Segunda": [0, 1, 2, 3], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
   "Hilário": {"Segunda": [0, 1, 2, 3], "Terça": [], "Quarta": [0, 1, 2, 3], "Quinta":  [], "Sexta": []},
   "Eloiza": {"Segunda": [0, 1, 2, 3], "Terça": [0, 1, 2, 3], "Quarta": [], "Quinta":  [], "Sexta": [0, 1, 2, 3]},
-  "Marçal": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]}
+  "Marçal": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
   "Querino": {"Segunda": [0, 1, 2, 3], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
   "Adriano": {"Segunda": [], "Terça": [], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
   "Allan": {"Segunda": [], "Terça": [], "Quarta": [], "Quinta":  [], "Sexta": [0, 1, 2, 3]},
-  "Antonio": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
+  "Antonio Cesar": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
   "Dario": {"Segunda": [], "Terça": [], "Quarta": [], "Quinta":  [0, 1, 2, 3], "Sexta": []},
   "Deise": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [], "Sexta": []},
   "Élvio": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [], "Quinta":  [0, 1, 2, 3], "Sexta": []},
-  "Faulin": {"Segunda": [0, 1, 2, 3] "Terça": [], "Quarta": [], "Quinta":  [], "Sexta": []},
+  "Faulin": {"Segunda": [0, 1, 2, 3], "Terça": [], "Quarta": [], "Quinta":  [], "Sexta": []},
   "Isaque": {"Segunda": [0, 1, 2, 3], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": []},
   "Marcel": {"Segunda": [], "Terça": [0, 1, 2, 3], "Quarta": [0, 1, 2, 3], "Quinta":  [], "Sexta": [0, 1, 2, 3]},
-  "Maurício": {"Segunda": [], "Terça": [], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": []},
-  "Vania": {"Segunda": [], "Terça": [], "Quarta": [], "Quinta":  [0, 1, 2, 3], "Sexta": [0, 1, 2, 3]},
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  "Maurício": {"Segunda": [], "Terça": [], "Quarta": [0, 1, 2, 3], "Quinta":  [0, 1, 2, 3], "Sexta": []}
 }
