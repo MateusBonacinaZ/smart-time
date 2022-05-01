@@ -7,9 +7,9 @@ import os
 
 class SmartTime:
     def __init__(self):
-        self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.informacoes_excel\
-            = self.coletar_informacoes()
+        self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.informacoes_excel = self.coletar_informacoes()
         self.populacao_inicial = self.gerar_populacao()
+        self.avaliar_populacao(self.populacao_inicial)
 
     @staticmethod
     def coletar_informacoes():
@@ -19,6 +19,7 @@ class SmartTime:
         numero_termos = None
         numero_aulas = None
         numero_dias = None
+        numero_professores = None
         informacoes_completas = []
 
         for configuracao in df['Configurações']:
@@ -31,6 +32,8 @@ class SmartTime:
                     numero_aulas = int(str(configuracao).split(':')[1].strip())
                 elif "dias" in str(configuracao):
                     numero_dias = int(str(configuracao).split(':')[1].strip())
+                elif "professores" in str(configuracao):
+                    numero_professores = int(str(configuracao).split(':')[1].strip())
 
         for termo in range(1, numero_termos+1):
 
@@ -44,7 +47,7 @@ class SmartTime:
             informacoes_termo.sort(key=lambda x: x[2], reverse=True)
             informacoes_completas.append(informacoes_termo)
 
-        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, informacoes_completas
+        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, informacoes_completas
 
     def gerar_populacao(self):
         populacao = []
@@ -93,9 +96,37 @@ class SmartTime:
                             disciplinas_termo.append(copia_disciplina)
 
             populacao.append(matriz_grade)
+        """
         for pop in populacao:
             print(pop, end="\n\n\n")
+        """
         return populacao
+
+    def avaliar_populacao(self, pop):
+        fitness_populacao = []
+        for individuo in pop:
+            valor_fitness = int(self.funcao_fitness(individuo))
+            fitness_populacao.append(valor_fitness)
+            print(valor_fitness)
+
+    def funcao_fitness(self, individuo):
+        valor_fitness = 67
+
+        for termo_fixo in range(self.numero_termos):
+
+            for aula in range(self.numero_aulas):
+
+                for dia in range(self.numero_dias):
+
+                    for termo in range(termo_fixo+1, self.numero_termos):
+
+                        if individuo[termo_fixo][dia][aula][1] == individuo[termo][dia][aula][1]:
+                            valor_fitness = 0
+                            return valor_fitness
+
+
+
+        return valor_fitness
 
 
 SmartTime()
