@@ -1,5 +1,6 @@
 # INDIVÍDUO, TERMO, DIA, MATÉRIA...
 
+import json
 import pandas as pd
 import random
 import os
@@ -7,20 +8,22 @@ import os
 
 class SmartTime:
     def __init__(self):
-        self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.informacoes_excel = self.coletar_informacoes()
+        self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.populacao_inicial = self.gerar_populacao()
         self.avaliar_populacao(self.populacao_inicial)
 
     @staticmethod
     def coletar_informacoes():
-        df = pd.read_excel(f"{os.path.dirname(os.path.realpath(__file__))}/planilha.xlsx")
-
         tamanho_populacao = None
         numero_termos = None
         numero_aulas = None
         numero_dias = None
         numero_professores = None
         informacoes_completas = []
+
+        df = pd.read_excel(f"{os.path.dirname(os.path.realpath(__file__))}/planilha.xlsx")
+        with open(f"{os.path.dirname(os.path.realpath(__file__))}/disponibilidade.json") as f:
+            disponibilidade_professores = json.load(f)
 
         for configuracao in df['Configurações']:
             if pd.isnull(configuracao) is False:
@@ -35,6 +38,10 @@ class SmartTime:
                 elif "professores" in str(configuracao):
                     numero_professores = int(str(configuracao).split(':')[1].strip())
 
+        if len(disponibilidade_professores) != numero_professores:
+            print("Número de professores incorreto!")
+            quit()
+
         for termo in range(1, numero_termos+1):
 
             informacoes_termo = []
@@ -47,7 +54,7 @@ class SmartTime:
             informacoes_termo.sort(key=lambda x: x[2], reverse=True)
             informacoes_completas.append(informacoes_termo)
 
-        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, informacoes_completas
+        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores,informacoes_completas
 
     def gerar_populacao(self):
         populacao = []

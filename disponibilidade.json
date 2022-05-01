@@ -1,0 +1,8 @@
+
+{
+  "Marisa": {"Segunda": [1, 2, 3, 4], "Terça": [1,2], "Quarta": [3,4], "Quinta":  [], "Sexta": []},
+  "Favan": {"Segunda": [1, 2, 3, 4], "Terça": [1, 2, 3, 4], "Quarta": [1, 2, 3, 4], "Quinta":  [1, 2, 3, 4], "Sexta": [1, 2, 3, 4]},
+  "Hilário": {"Segunda": [3,4], "Terça": [1, 2, 3, 4], "Quarta": [1, 2, 3, 4], "Quinta":  [1, 2, 3, 4], "Sexta": [1,2]},
+  "Eloiza": {"Segunda": [2,4], "Terça": [1, 2, 3, 4], "Quarta": [1, 2, 3, 4], "Quinta":  [1, 2, 3, 4], "Sexta": [1]},
+  "Marçal": {"Segunda": [1,3], "Terça": [2,4], "Quarta": [2,4], "Quinta":  [2,4], "Sexta": []}
+}
