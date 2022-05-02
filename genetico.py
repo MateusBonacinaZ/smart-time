@@ -1,7 +1,7 @@
 # INDIVÍDUO, TERMO, DIA, MATÉRIA...
 
-import json
 import pandas as pd
+import json
 import random
 import os
 
@@ -10,7 +10,6 @@ class SmartTime:
     def __init__(self):
         self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.verificar_erros_importacao()
-        quit()
         self.populacao_inicial = self.gerar_populacao()
         self.avaliar_populacao(self.populacao_inicial)
 
@@ -136,14 +135,16 @@ class SmartTime:
 
     def avaliar_populacao(self, pop):
         fitness_populacao = []
+
         for individuo in pop:
             valor_fitness = int(self.funcao_fitness(individuo))
             fitness_populacao.append(valor_fitness)
-            print(valor_fitness)
+            print(f"O valor fitness do indivíduo é: {valor_fitness}")
 
     def funcao_fitness(self, individuo):
-        valor_fitness = 67
+        valor_fitness = 0
 
+        """
         for termo_fixo in range(self.numero_termos):
 
             for aula in range(self.numero_aulas):
@@ -155,8 +156,28 @@ class SmartTime:
                         if individuo[termo_fixo][dia][aula][1] == individuo[termo][dia][aula][1]:
                             valor_fitness = 0
                             return valor_fitness
+        """
 
+        for termo in range(self.numero_termos):
+            for dia in range(self.numero_dias):
+                for aula in range(self.numero_aulas):
+                    informacao_disponibilidade = self.disponibilidade_professores[individuo[termo][dia][aula][1]]
 
+                    if dia == 0:
+                        informacao_disponibilidade = informacao_disponibilidade["Segunda"]
+                    elif dia == 1:
+                        informacao_disponibilidade = informacao_disponibilidade["Terça"]
+                    elif dia == 2:
+                        informacao_disponibilidade = informacao_disponibilidade["Quarta"]
+                    elif dia == 3:
+                        informacao_disponibilidade = informacao_disponibilidade["Quinta"]
+                    elif dia == 4:
+                        informacao_disponibilidade = informacao_disponibilidade["Sexta"]
+                    elif dia == 5:
+                        informacao_disponibilidade = informacao_disponibilidade["Sábado"]
+
+                    if aula in informacao_disponibilidade:
+                        valor_fitness += 1
 
         return valor_fitness
 
