@@ -144,6 +144,15 @@ class SmartTime:
     def funcao_fitness(self, individuo):
         valor_fitness = 0
 
+        """indi = [
+            [[('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário')], [('Fundamentos de leitura e produção de textos', 'Eloiza'), ('Fundamentos de leitura e produção de textos', 'Eloiza'), ('Sociedade, tecnologia e inovação', 'Cézar'), ('Sociedade, tecnologia e inovação', 'Cézar')], [('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal')], [('Produção vegetal de culturas anuais', 'Élvio'), ('Produção vegetal de culturas anuais', 'Élvio'), ('Inglês I', 'Eloiza'), ('Inglês I', 'Eloiza')], [('Ética e valores', 'Cézar'), ('Ética e valores', 'Cézar'), ('Introdução a big data', 'Allan'), ('Introdução a big data', 'Allan')]],
+            [[('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque')], [('Produção vegetal de culturas perenes e green houses', 'Élvio'),('Produção vegetal de culturas perenes e green houses', 'Élvio'),('', 'Eloiza'),('', 'Eloiza')], [('','Favan'),('','Favan'),('','Favan'),('','Favan')], [('', 'Cézar'),('', 'Cézar'),('', 'Dario'),('', 'Dario')], [('','Marçal'),('','Marçal'),('','Marçal'),('','Marçal')]],
+            [[('','Favan'),('','Favan'),('','Marisa'),('','Marisa')], [('', 'Isaque'),('', 'Isaque'),('', 'Isaque'),('', 'Isaque')], [('', 'Deise'),('', 'Deise'),('', 'Deise'),('', 'Deise')], [('', 'Eloiza'),('', 'Eloiza'),('','Marçal'),('','Marçal')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')]],
+            [[('', 'Eloiza'),('', 'Eloiza'),('', 'Faulin'),('', 'Faulin')], [('', 'Marcel'),('', 'Marcel'),('', 'Marcel'),('', 'Marcel')], [('', 'Adriano'),('', 'Adriano'),('', 'Adriano'),('', 'Adriano')], [('', 'Adriano'),('', 'Adriano'),('','Cézar'),('','Cézar')], [('', 'Adriano'),('', 'Adriano'),('', 'Adriano'),('', 'Adriano')]],
+            [[('','Marisa'), ('','Marisa'), ('','Favan'), ('','Favan')], [('','Favan'),('','Favan'),('','Favan'),('','Favan')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')], [('', 'Marcel'),('', 'Marcel'),('', 'Eloiza'),('', 'Eloiza')]],
+            [[('','Querino'), ('','Querino'), ('', 'Eloiza'), ('', 'Eloiza')], [('','Querino'), ('','Querino'), ('','Querino'), ('','Querino')], [('', 'Mauricio'), ('', 'Mauricio'), ('', 'Mauricio'), ('', 'Mauricio')], [('','Favan'), ('','Favan'), ('','Favan'), ('','Favan')], [('','Favan'), ('','Favan'), ('','Favan'), ('','Favan')]],
+        ]"""
+
         """
         for termo_fixo in range(self.numero_termos):
 
@@ -175,10 +184,69 @@ class SmartTime:
                         informacao_disponibilidade = informacao_disponibilidade["Sexta"]
                     elif dia == 5:
                         informacao_disponibilidade = informacao_disponibilidade["Sábado"]
+                    elif dia == 6:
+                        informacao_disponibilidade = informacao_disponibilidade["Domingo"]
 
                     if aula in informacao_disponibilidade:
                         valor_fitness += 1
+        """
+        picote = False
+        for termo in range(self.numero_termos):
+            disciplinas_termo = []
+            for disciplina in self.informacoes_excel[termo]:
+                disciplinas_termo.append(disciplina)
 
+            for dia in range(self.numero_dias):
+                aula = 0
+                primeira_execucao = True
+
+                while aula < self.numero_aulas:
+                    for x in disciplinas_termo:
+                        if x[0] == individuo[termo][dia][aula][0]:
+                            disciplina = x
+                            break
+
+                    #print(individuo[termo][dia][aula])
+                    #print(x)
+                    #print(disciplinas_termo, end="\n\n")
+
+                    if int(disciplina[2]) <= self.numero_aulas:
+                        if aula+int(disciplina[2]) <= self.numero_aulas:
+                            for verificacao in range(1, int(disciplina[2])):
+                                if individuo[termo][dia][aula-1][0] != individuo[termo][dia][aula+verificacao-1][0]:
+                                    picote = True
+                                    print("Picotou")
+                                    break
+                        else:
+                            picote = True
+                            print("Picotou")
+                            break
+                        disciplinas_termo.remove(disciplina)
+
+                    elif int(disciplina[2]) > self.numero_aulas:
+                        for verificacao in range(1, self.numero_aulas):
+                            if individuo[termo][dia][aula-1][0] != individuo[termo][dia][aula+verificacao-1][0]:
+                                picote = True
+                                print("Picotou")
+                                break
+
+                        copia_disciplina = (f'{disciplina[0]}', f'{disciplina[1]}', f'{int(disciplina[2])-self.numero_aulas}')
+                        disciplinas_termo.remove(disciplina)
+                        disciplinas_termo.append(copia_disciplina)
+
+                    aula += int(disciplina[2])
+                    print(aula)
+
+                if picote is True:
+                    break
+
+            if picote is True:
+                break
+
+        if picote is False:
+            for termo in range(self.numero_termos):
+                print(individuo[termo], end="\n\n")
+        """
         return valor_fitness
 
 
