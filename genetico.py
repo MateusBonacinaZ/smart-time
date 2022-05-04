@@ -10,8 +10,11 @@ class SmartTime:
     def __init__(self):
         self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.verificar_erros_importacao()
-        self.populacao_inicial = self.gerar_populacao()
-        self.avaliar_populacao(self.populacao_inicial)
+        self.populacao_inicial = self.gerar_populacao_inicial()
+        for ind in self.populacao_inicial:
+            print(ind, end="\n\n\n")
+
+        self.avaliar_populacao()
 
     @staticmethod
     def coletar_informacoes():
@@ -80,63 +83,88 @@ class SmartTime:
                     print("ERRO: Professores discrepantes!")
                     quit()
 
-    def gerar_populacao(self):
+    def gerar_populacao_inicial(self):
         populacao = []
 
-        for individuo in range(self.tamanho_populacao):
-            matriz_grade = []
+        tamanho = len(populacao)
+        while tamanho != self.tamanho_populacao:
+            individuo = self.gerar_cromossomo()
 
-            for matriz_termos in range(self.numero_termos):
-                matriz_grade.append([])
+            if individuo is not False:
+                populacao.append(individuo)
+                tamanho = len(populacao)
 
-                for matriz_dias in range(self.numero_dias):
-                    matriz_grade[matriz_termos].append([])
-
-                    for matriz_aulas in range(self.numero_aulas):
-                        matriz_grade[matriz_termos][matriz_dias].append(None)
-
-            for termo in range(self.numero_termos):
-
-                disciplinas_termo = []
-                for disciplina in self.informacoes_excel[termo]:
-                    disciplinas_termo.append(disciplina)
-
-                for dia in range(self.numero_dias):
-
-                    while matriz_grade[termo][dia].count(None) != 0:
-
-                        disciplina_sorteada = random.randint(0, len(disciplinas_termo)-1)
-
-                        if matriz_grade[termo][dia].count(None) >= int(disciplinas_termo[disciplina_sorteada][2]):
-                            contador = 0
-                            for aula in range(len(matriz_grade[termo][dia])):
-                                if matriz_grade[termo][dia][aula] is None:
-                                    contador += 1
-                                    if int(disciplinas_termo[disciplina_sorteada][2]) >= contador:
-                                        matriz_grade[termo][dia][aula] = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}')
-                            disciplinas_termo.remove(disciplinas_termo[disciplina_sorteada])
-
-                        elif matriz_grade[termo][dia].count(None) < int(disciplinas_termo[disciplina_sorteada][2]):
-                            contador = 0
-                            for aula in range(len(matriz_grade[termo][dia])):
-                                if matriz_grade[termo][dia][aula] is None:
-                                    contador += 1
-                                    matriz_grade[termo][dia][aula] = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}')
-                            copia_disciplina = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}', f'{int(disciplinas_termo[disciplina_sorteada][2])-contador}')
-                            disciplinas_termo.remove(disciplinas_termo[disciplina_sorteada])
-                            disciplinas_termo.append(copia_disciplina)
-
-            populacao.append(matriz_grade)
-        """
-        for pop in populacao:
-            print(pop, end="\n\n\n")
-        """
         return populacao
 
-    def avaliar_populacao(self, pop):
+    def gerar_cromossomo(self):
+        matriz_grade = []
+
+        for matriz_termos in range(self.numero_termos):
+            matriz_grade.append([])
+
+            for matriz_dias in range(self.numero_dias):
+                matriz_grade[matriz_termos].append([])
+
+                for matriz_aulas in range(self.numero_aulas):
+                    matriz_grade[matriz_termos][matriz_dias].append(None)
+
+        for termo in range(self.numero_termos):
+
+            disciplinas_termo = []
+            for disciplina in self.informacoes_excel[termo]:
+                disciplinas_termo.append(disciplina)
+
+            for dia in range(self.numero_dias):
+
+                erro = 0
+                while matriz_grade[termo][dia].count(None) != 0:
+                    contador = 0
+
+                    disciplina_sorteada = random.randint(0, len(disciplinas_termo)-1)
+
+                    if matriz_grade[termo][dia].count(None) >= int(disciplinas_termo[disciplina_sorteada][2]):
+                        for aula in range(int(disciplinas_termo[disciplina_sorteada][2])):
+                            posicao = matriz_grade[termo][dia].index(None)
+                            if self.verificar_choques(matriz_grade, termo, dia, posicao, disciplinas_termo[disciplina_sorteada][1]) is False:
+                                matriz_grade[termo][dia][posicao] = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}')
+                                contador += 1
+                            else:
+                                erro += 1
+                                if erro == 50:
+                                    return False
+
+                    elif matriz_grade[termo][dia].count(None) < int(disciplinas_termo[disciplina_sorteada][2]):
+                        for aula in range(matriz_grade[termo][dia].count(None)):
+                            posicao = matriz_grade[termo][dia].index(None)
+                            if self.verificar_choques(matriz_grade, termo, dia, posicao, disciplinas_termo[disciplina_sorteada][1]) is False:
+                                matriz_grade[termo][dia][posicao] = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}')
+                                contador += 1
+                            else:
+                                erro += 1
+                                if erro == 50:
+                                    return False
+
+                    if int(disciplinas_termo[disciplina_sorteada][2]) == contador:
+                        disciplinas_termo.remove(disciplinas_termo[disciplina_sorteada])
+                    else:
+                        copia_disciplina = (f'{disciplinas_termo[disciplina_sorteada][0]}', f'{disciplinas_termo[disciplina_sorteada][1]}', f'{int(disciplinas_termo[disciplina_sorteada][2]) - contador}')
+                        disciplinas_termo.remove(disciplinas_termo[disciplina_sorteada])
+                        disciplinas_termo.append(copia_disciplina)
+
+        return matriz_grade
+
+    @staticmethod
+    def verificar_choques(individuo, termo_individuo, dia_individuo, aula_individuo, professor_sorteado):
+        if termo_individuo != 0:
+            for termo_comparacao in range(0, termo_individuo):
+                if individuo[termo_comparacao][dia_individuo][aula_individuo][1] == professor_sorteado:
+                    return True
+        return False
+
+    def avaliar_populacao(self):
         fitness_populacao = []
 
-        for individuo in pop:
+        for individuo in self.populacao_inicial:
             valor_fitness = int(self.funcao_fitness(individuo))
             fitness_populacao.append(valor_fitness)
             print(f"O valor fitness do indivíduo é: {valor_fitness}")
@@ -144,16 +172,6 @@ class SmartTime:
     def funcao_fitness(self, individuo):
         valor_fitness = 0
 
-        """indi = [
-            [[('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário'), ('Logica de programação', 'Hilário')], [('Fundamentos de leitura e produção de textos', 'Eloiza'), ('Fundamentos de leitura e produção de textos', 'Eloiza'), ('Sociedade, tecnologia e inovação', 'Cézar'), ('Sociedade, tecnologia e inovação', 'Cézar')], [('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal'), ('Matemática Discreta', 'Marçal')], [('Produção vegetal de culturas anuais', 'Élvio'), ('Produção vegetal de culturas anuais', 'Élvio'), ('Inglês I', 'Eloiza'), ('Inglês I', 'Eloiza')], [('Ética e valores', 'Cézar'), ('Ética e valores', 'Cézar'), ('Introdução a big data', 'Allan'), ('Introdução a big data', 'Allan')]],
-            [[('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque'),('Java I orientação a objetos', 'Isaque')], [('Produção vegetal de culturas perenes e green houses', 'Élvio'),('Produção vegetal de culturas perenes e green houses', 'Élvio'),('', 'Eloiza'),('', 'Eloiza')], [('','Favan'),('','Favan'),('','Favan'),('','Favan')], [('', 'Cézar'),('', 'Cézar'),('', 'Dario'),('', 'Dario')], [('','Marçal'),('','Marçal'),('','Marçal'),('','Marçal')]],
-            [[('','Favan'),('','Favan'),('','Marisa'),('','Marisa')], [('', 'Isaque'),('', 'Isaque'),('', 'Isaque'),('', 'Isaque')], [('', 'Deise'),('', 'Deise'),('', 'Deise'),('', 'Deise')], [('', 'Eloiza'),('', 'Eloiza'),('','Marçal'),('','Marçal')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')]],
-            [[('', 'Eloiza'),('', 'Eloiza'),('', 'Faulin'),('', 'Faulin')], [('', 'Marcel'),('', 'Marcel'),('', 'Marcel'),('', 'Marcel')], [('', 'Adriano'),('', 'Adriano'),('', 'Adriano'),('', 'Adriano')], [('', 'Adriano'),('', 'Adriano'),('','Cézar'),('','Cézar')], [('', 'Adriano'),('', 'Adriano'),('', 'Adriano'),('', 'Adriano')]],
-            [[('','Marisa'), ('','Marisa'), ('','Favan'), ('','Favan')], [('','Favan'),('','Favan'),('','Favan'),('','Favan')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')], [('','Querino'),('','Querino'),('','Querino'),('','Querino')], [('', 'Marcel'),('', 'Marcel'),('', 'Eloiza'),('', 'Eloiza')]],
-            [[('','Querino'), ('','Querino'), ('', 'Eloiza'), ('', 'Eloiza')], [('','Querino'), ('','Querino'), ('','Querino'), ('','Querino')], [('', 'Mauricio'), ('', 'Mauricio'), ('', 'Mauricio'), ('', 'Mauricio')], [('','Favan'), ('','Favan'), ('','Favan'), ('','Favan')], [('','Favan'), ('','Favan'), ('','Favan'), ('','Favan')]],
-        ]"""
-
-        """
         for termo_fixo in range(self.numero_termos):
 
             for aula in range(self.numero_aulas):
@@ -165,10 +183,11 @@ class SmartTime:
                         if individuo[termo_fixo][dia][aula][1] == individuo[termo][dia][aula][1]:
                             valor_fitness = 0
                             return valor_fitness
-        """
 
         for termo in range(self.numero_termos):
+
             for dia in range(self.numero_dias):
+
                 for aula in range(self.numero_aulas):
                     informacao_disponibilidade = self.disponibilidade_professores[individuo[termo][dia][aula][1]]
 
@@ -189,9 +208,11 @@ class SmartTime:
 
                     if aula in informacao_disponibilidade:
                         valor_fitness += 1
-        """
+
+                    """
         picote = False
         for termo in range(self.numero_termos):
+            
             disciplinas_termo = []
             for disciplina in self.informacoes_excel[termo]:
                 disciplinas_termo.append(disciplina)
@@ -247,6 +268,7 @@ class SmartTime:
             for termo in range(self.numero_termos):
                 print(individuo[termo], end="\n\n")
         """
+
         return valor_fitness
 
 
