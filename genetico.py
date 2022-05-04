@@ -11,9 +11,6 @@ class SmartTime:
         self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.verificar_erros_importacao()
         self.populacao_inicial = self.gerar_populacao_inicial()
-        for ind in self.populacao_inicial:
-            print(ind, end="\n\n\n")
-
         self.avaliar_populacao()
 
     @staticmethod
@@ -209,65 +206,22 @@ class SmartTime:
                     if aula in informacao_disponibilidade:
                         valor_fitness += 1
 
-                    """
-        picote = False
         for termo in range(self.numero_termos):
-            
+
             disciplinas_termo = []
             for disciplina in self.informacoes_excel[termo]:
-                disciplinas_termo.append(disciplina)
+                if int(disciplina[2]) >= self.numero_aulas:
+                    disciplinas_termo.append(disciplina)
 
             for dia in range(self.numero_dias):
-                aula = 0
-                primeira_execucao = True
 
-                while aula < self.numero_aulas:
-                    for x in disciplinas_termo:
-                        if x[0] == individuo[termo][dia][aula][0]:
-                            disciplina = x
-                            break
+                disciplinas_dia = []
+                for aula in range(self.numero_aulas):
+                    disciplinas_dia.append(individuo[termo][dia][aula][0])
 
-                    #print(individuo[termo][dia][aula])
-                    #print(x)
-                    #print(disciplinas_termo, end="\n\n")
-
-                    if int(disciplina[2]) <= self.numero_aulas:
-                        if aula+int(disciplina[2]) <= self.numero_aulas:
-                            for verificacao in range(1, int(disciplina[2])):
-                                if individuo[termo][dia][aula-1][0] != individuo[termo][dia][aula+verificacao-1][0]:
-                                    picote = True
-                                    print("Picotou")
-                                    break
-                        else:
-                            picote = True
-                            print("Picotou")
-                            break
-                        disciplinas_termo.remove(disciplina)
-
-                    elif int(disciplina[2]) > self.numero_aulas:
-                        for verificacao in range(1, self.numero_aulas):
-                            if individuo[termo][dia][aula-1][0] != individuo[termo][dia][aula+verificacao-1][0]:
-                                picote = True
-                                print("Picotou")
-                                break
-
-                        copia_disciplina = (f'{disciplina[0]}', f'{disciplina[1]}', f'{int(disciplina[2])-self.numero_aulas}')
-                        disciplinas_termo.remove(disciplina)
-                        disciplinas_termo.append(copia_disciplina)
-
-                    aula += int(disciplina[2])
-                    print(aula)
-
-                if picote is True:
-                    break
-
-            if picote is True:
-                break
-
-        if picote is False:
-            for termo in range(self.numero_termos):
-                print(individuo[termo], end="\n\n")
-        """
+                for disciplina_comparacao in disciplinas_termo:
+                    if disciplinas_dia.count(disciplina_comparacao[0]) == self.numero_aulas:
+                        valor_fitness += 1
 
         return valor_fitness
 
