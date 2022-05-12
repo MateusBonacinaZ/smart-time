@@ -10,8 +10,9 @@ class SmartTime:
     def __init__(self):
         self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.verificar_erros_importacao()
-        self.populacao_inicial = self.gerar_populacao_inicial()
-        self.avaliar_populacao()
+        self.populacao = self.gerar_populacao_inicial()
+        self.fitness_populacao = self.avaliar_populacao()
+        self.vetor_roleta = self.gerar_roleta()
 
     @staticmethod
     def coletar_informacoes():
@@ -161,10 +162,12 @@ class SmartTime:
     def avaliar_populacao(self):
         fitness_populacao = []
 
-        for individuo in self.populacao_inicial:
+        for individuo in self.populacao:
             valor_fitness = int(self.funcao_fitness(individuo))
             fitness_populacao.append(valor_fitness)
             print(f"O valor fitness do indivíduo é: {valor_fitness}")
+
+        return fitness_populacao
 
     def funcao_fitness(self, individuo):
         valor_fitness = 0
@@ -225,5 +228,25 @@ class SmartTime:
 
         return valor_fitness
 
+    def gerar_roleta(self):
+        vetor_roleta = []
+        soma_fitness = sum(self.fitness_populacao)
+
+        for individuo in range(self.tamanho_populacao):
+
+            valor = (self.fitness_populacao[individuo]/soma_fitness)*100
+            peso_roleta = int(round(valor, 0))
+
+            print(f"VL:{valor}")
+            print(f"PR:{peso_roleta}", end="\n\n\n")
+
+            for posicao in range(peso_roleta):
+                if posicao > 99:
+                    break
+                print(posicao)
+                vetor_roleta.append(individuo)
+
+        print(vetor_roleta, end="\n\n")
+        print(len(vetor_roleta))
 
 SmartTime()
