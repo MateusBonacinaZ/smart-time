@@ -8,11 +8,40 @@ import os
 
 class SmartTime:
     def __init__(self):
-        self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
+        self.numero_geracoes, self.tamanho_populacao, self.numero_termos, self.numero_aulas, self.numero_dias, self.numero_professores, self.disponibilidade_professores, self.informacoes_excel = self.coletar_informacoes()
         self.verificar_erros_importacao()
         self.populacao = self.gerar_populacao_inicial()
-        self.fitness_populacao = self.avaliar_populacao()
-        self.vetor_roleta = self.gerar_roleta()
+
+        lista_media = []
+        self.melhor_individuo = {
+            "Pontuação": 0,
+            "Index": None,
+            "Grade": None
+        }
+
+        for geracao in range(1, self.numero_geracoes+1):
+            print(f"Geração: {geracao}")
+            self.fitness_populacao = self.avaliar_populacao()
+
+            lista_media.append(sum(self.fitness_populacao)/len(self.fitness_populacao))
+
+
+            if max(self.fitness_populacao) > self.melhor_individuo["Pontuação"]:
+                self.melhor_individuo = {
+                    "Pontuação": max(self.fitness_populacao),
+                    # "Index": self.fitness_populacao.index(max(self.fitness_populacao)),
+                    "Grade": self.populacao[self.fitness_populacao.index(max(self.fitness_populacao))]
+                }
+
+            if geracao == 1:
+                print(f"\n\n{self.melhor_individuo}", end="\n\n")
+
+            self.vetor_roleta = self.gerar_roleta()
+            self.populacao = self.gerar_nova_populacao()
+
+        print(len(lista_media))
+        print(f"A média foi de {sum(lista_media)/len(lista_media)}")
+        print(f"\n\n{self.melhor_individuo}", end="\n\n")
 
     @staticmethod
     def coletar_informacoes():
@@ -21,6 +50,7 @@ class SmartTime:
         numero_aulas = None
         numero_dias = None
         numero_professores = None
+        numero_geracoes = None
         informacoes_completas = []
 
         df = pd.read_excel(f"{os.path.dirname(os.path.realpath(__file__))}/planilha.xlsx")
@@ -29,7 +59,9 @@ class SmartTime:
 
         for configuracao in df['Configurações']:
             if pd.isnull(configuracao) is False:
-                if "população" in str(configuracao):
+                if "gerações" in str(configuracao):
+                    numero_geracoes = int(str(configuracao).split(':')[1].strip())
+                elif "população" in str(configuracao):
                     tamanho_populacao = int(str(configuracao).split(':')[1].strip())
                 elif "termos" in str(configuracao):
                     numero_termos = int(str(configuracao).split(':')[1].strip())
@@ -52,7 +84,7 @@ class SmartTime:
             informacoes_termo.sort(key=lambda x: x[2], reverse=True)
             informacoes_completas.append(informacoes_termo)
 
-        return tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores, informacoes_completas
+        return numero_geracoes, tamanho_populacao, numero_termos, numero_aulas, numero_dias, numero_professores, disponibilidade_professores, informacoes_completas
 
     def verificar_erros_importacao(self):
 
@@ -159,13 +191,27 @@ class SmartTime:
                     return True
         return False
 
+    def verificar_choques_crossover(self, individuo):
+        for termo_fixo in range(self.numero_termos):
+
+            for aula in range(self.numero_aulas):
+
+                for dia in range(self.numero_dias):
+
+                    for termo in range(termo_fixo+1, self.numero_termos):
+
+                        if individuo[termo_fixo][dia][aula][1] == individuo[termo][dia][aula][1]:
+                            return True
+
+        return False
+
     def avaliar_populacao(self):
         fitness_populacao = []
 
         for individuo in self.populacao:
             valor_fitness = int(self.funcao_fitness(individuo))
             fitness_populacao.append(valor_fitness)
-            print(f"O valor fitness do indivíduo é: {valor_fitness}")
+            # print(f"O valor fitness do indivíduo é: {valor_fitness}")
 
         return fitness_populacao
 
@@ -232,21 +278,98 @@ class SmartTime:
         vetor_roleta = []
         soma_fitness = sum(self.fitness_populacao)
 
+        melhor_individuo = {
+            "Individuo": 0,
+            "Valor": 0
+        }
+
         for individuo in range(self.tamanho_populacao):
 
             valor = (self.fitness_populacao[individuo]/soma_fitness)*100
-            peso_roleta = int(round(valor, 0))
+            peso_roleta = int(round(valor))
 
-            print(f"VL:{valor}")
-            print(f"PR:{peso_roleta}", end="\n\n\n")
+            if valor > melhor_individuo["Valor"]:
+                melhor_individuo["Individuo"] = individuo
+                melhor_individuo["Valor"] = valor
 
             for posicao in range(peso_roleta):
-                if posicao > 99:
+                if len(vetor_roleta) > 99:
                     break
-                print(posicao)
-                vetor_roleta.append(individuo)
+                else:
+                    vetor_roleta.append(individuo)
 
-        print(vetor_roleta, end="\n\n")
-        print(len(vetor_roleta))
+        if len(vetor_roleta) < 100:
+            for individuo in range(len(vetor_roleta), 100):
+                vetor_roleta.append(melhor_individuo["Individuo"])
+            vetor_roleta = sorted(vetor_roleta)
+
+        return vetor_roleta
+
+    def gerar_nova_populacao(self):
+        trava = True
+        while trava is not False:
+            nova_populacao = []
+
+            roleta = []
+            for ponto in self.vetor_roleta:
+                roleta.append(ponto)
+
+            tamanho_nova_populacao = len(nova_populacao)
+            tamanho_atual_populacao = len(self.populacao)
+            erros = 0
+            while tamanho_nova_populacao != tamanho_atual_populacao:
+                index_individuo_1 = random.choice(roleta)
+                index_individuo_2 = random.choice(roleta)
+
+                if index_individuo_1 != index_individuo_2:
+                    termo_corte = random.randint(1, self.numero_termos)
+
+                    individuo_1 = self.populacao[index_individuo_1]
+                    individuo_2 = self.populacao[index_individuo_2]
+
+                    individuo_1_modificado = individuo_1[:termo_corte]+individuo_2[termo_corte:]
+                    individuo_2_modificado = individuo_2[:termo_corte] + individuo_1[termo_corte:]
+
+                    individuos_modificados = []
+                    for individuo in range(1,3):
+                        if individuo == 1:
+                            individuos_modificados.append(individuo_1_modificado)
+                        elif individuo == 2:
+                            individuos_modificados.append(individuo_2_modificado)
+
+                    choque = False
+                    for individuo in individuos_modificados:
+                        if self.verificar_choques_crossover(individuo):
+                            choque = True
+                            erros += 1
+                            break
+
+                    if erros > 1000:
+                        break
+
+                    if choque is False:
+
+                        index_remover = []
+                        for posicao in range(len(roleta)):
+                            if roleta[posicao] == index_individuo_1 or roleta[posicao] == index_individuo_2:
+                                index_remover.append(posicao)
+
+                        index_remover = sorted(index_remover, reverse = True)
+
+                        for posicao in index_remover:
+                            del roleta[posicao]
+
+                        for individuo in individuos_modificados:
+                            nova_populacao.append(individuo)
+
+                        tamanho_nova_populacao = len(nova_populacao)
+
+            if tamanho_nova_populacao == tamanho_atual_populacao:
+                trava = False
+
+        # nova_populacao.remove(random.choice(nova_populacao))
+        # nova_populacao.append(self.melhor_individuo["Grade"])
+
+        return nova_populacao
 
 SmartTime()
