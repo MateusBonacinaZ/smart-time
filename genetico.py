@@ -1,5 +1,6 @@
 # INDIVÍDUO, TERMO, DIA, MATÉRIA...
 
+from datetime import datetime
 import pandas as pd
 import json
 import random
@@ -29,19 +30,22 @@ class SmartTime:
             if max(self.fitness_populacao) > self.melhor_individuo["Pontuação"]:
                 self.melhor_individuo = {
                     "Pontuação": max(self.fitness_populacao),
-                    # "Index": self.fitness_populacao.index(max(self.fitness_populacao)),
                     "Grade": self.populacao[self.fitness_populacao.index(max(self.fitness_populacao))]
                 }
 
             if geracao == 1:
-                print(f"\n\n{self.melhor_individuo}", end="\n\n")
+                self.valor_inicial = self.melhor_individuo
 
             self.vetor_roleta = self.gerar_roleta()
             self.populacao = self.gerar_nova_populacao()
 
-        print(len(lista_media))
-        print(f"A média foi de {sum(lista_media)/len(lista_media)}")
-        print(f"\n\n{self.melhor_individuo}", end="\n\n")
+        self.salvar_excel()
+        print("Estatísticas: ")
+        print(f"Foram avaliadas {self.tamanho_populacao*self.numero_geracoes}.")
+        print(f"A média das grades foram {round(sum(lista_media)/len(lista_media), 2)}.")
+        print(f"A grade evoluiu de {self.valor_inicial['Pontuação']} -> {self.melhor_individuo['Pontuação']}.")
+        print(f"Você pode encontrar o melhor indivíduo na pasta de resultados!")
+
 
     @staticmethod
     def coletar_informacoes():
@@ -371,5 +375,84 @@ class SmartTime:
         # nova_populacao.append(self.melhor_individuo["Grade"])
 
         return nova_populacao
+
+    def salvar_excel(self):
+
+        dados = {}
+        dict_termo_horario = {"Aula e termo": []}
+        for termo in range(1, self.numero_termos+1):
+            for aula in range(1, self.numero_aulas+1):
+                dict_termo_horario["Aula e termo"].append(f"{aula}° aula - {termo}° termo")
+            dict_termo_horario["Aula e termo"].append("")
+        dados.update(dict_termo_horario)
+
+        for dia in range(self.numero_dias):
+
+            dict_dia = {}
+            if dia == 0:
+                dict_dia = {"Segunda-feira": []}
+                index_dia = dict_dia["Segunda-feira"]
+            elif dia == 1:
+                dict_dia = {"Terça-feira": []}
+                index_dia = dict_dia["Terça-feira"]
+            elif dia == 2:
+                dict_dia = {"Quarta-feira": []}
+                index_dia = dict_dia["Quarta-feira"]
+            elif dia == 3:
+                dict_dia = {"Quinta-feira": []}
+                index_dia = dict_dia["Quinta-feira"]
+            elif dia == 4:
+                dict_dia = {"Sexta-feira": []}
+                index_dia = dict_dia["Sexta-feira"]
+            elif dia == 5:
+                dict_dia = {"Sábado": []}
+                index_dia = dict_dia["Sábado"]
+            elif dia == 6:
+                dict_dia = {"Domingo": []}
+                index_dia = dict_dia["Domingo"]
+
+            for termo in range(self.numero_termos):
+
+                for aula in range(self.numero_aulas):
+                    disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                    professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                    index_dia.append(f"{disciplina}, {professor}")
+
+                index_dia.append("")
+
+            dados.update(dict_dia)
+
+            """
+                    if dia == 0:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Segunda-feira"].append(f"{disciplina}, {professor}")
+                    elif dia == 1:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Terça-feira"].append(f"{disciplina}, {professor}")
+                    elif dia == 2:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Quarta-feira"].append(f"{disciplina}, {professor}")
+                    elif dia == 3:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Quinta-feira"].append(f"{disciplina}, {professor}")
+                    elif dia == 4:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Sexta-feira"].append(f"{disciplina}, {professor}")
+                    elif dia == 5:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Sábado"].append(f"{disciplina}, {professor}")
+                    elif dia == 6:
+                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
+                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
+                        dict_dia["Domingo"].append(f"{disciplina}, {professor}")
+                    """
+        data_frame = pd.DataFrame(dados)
+        data_frame.to_excel(f"{os.path.dirname(os.path.realpath(__file__))}/Resultados/{datetime.now().strftime('%d-%m-%Y %H:%M')} ({self.melhor_individuo['Pontuação']}).xlsx")
 
 SmartTime()
