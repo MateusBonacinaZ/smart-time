@@ -423,6 +423,6 @@ class SmartTime:
             dados.update(dict_dia)
 
         data_frame = pd.DataFrame(dados)
-        data_frame.to_excel(f"{os.path.dirname(os.path.realpath(__file__))}/Resultados/{datetime.now().strftime('%d-%m-%Y %H:%M')} ({self.melhor_individuo['Pontuação']}).xlsx")
+        data_frame.to_excel(f"{os.path.dirname(os.path.realpath(__file__))}/Resultados/{datetime.now().strftime('%d-%m-%Y %Hh %Mm')} ({self.melhor_individuo['Pontuação']}).xlsx")
 
 SmartTime()
