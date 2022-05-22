@@ -58,7 +58,7 @@ class SmartTime:
         informacoes_completas = []
 
         df = pd.read_excel(f"{os.path.dirname(os.path.realpath(__file__))}/planilha.xlsx")
-        with open(f"{os.path.dirname(os.path.realpath(__file__))}/disponibilidade.json") as f:
+        with open(f"{os.path.dirname(os.path.realpath(__file__))}/disponibilidade.json", encoding="utf-8") as f:
             disponibilidade_professores = json.load(f)
 
         for configuracao in df['Configurações']:
@@ -422,36 +422,6 @@ class SmartTime:
 
             dados.update(dict_dia)
 
-            """
-                    if dia == 0:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Segunda-feira"].append(f"{disciplina}, {professor}")
-                    elif dia == 1:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Terça-feira"].append(f"{disciplina}, {professor}")
-                    elif dia == 2:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Quarta-feira"].append(f"{disciplina}, {professor}")
-                    elif dia == 3:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Quinta-feira"].append(f"{disciplina}, {professor}")
-                    elif dia == 4:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Sexta-feira"].append(f"{disciplina}, {professor}")
-                    elif dia == 5:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Sábado"].append(f"{disciplina}, {professor}")
-                    elif dia == 6:
-                        disciplina = self.melhor_individuo["Grade"][termo][dia][aula][0]
-                        professor = self.melhor_individuo["Grade"][termo][dia][aula][1]
-                        dict_dia["Domingo"].append(f"{disciplina}, {professor}")
-                    """
         data_frame = pd.DataFrame(dados)
         data_frame.to_excel(f"{os.path.dirname(os.path.realpath(__file__))}/Resultados/{datetime.now().strftime('%d-%m-%Y %H:%M')} ({self.melhor_individuo['Pontuação']}).xlsx")
 
